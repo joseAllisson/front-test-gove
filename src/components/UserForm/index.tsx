@@ -1,16 +1,16 @@
 'use client';
 
-import { Button, Checkbox, FormControlLabel, FormGroup, TextField } from '@mui/material';
-import CustomBreadcrumbs from '../CustomBreadcrumbs';
-import CustomSelect from '../CustomSelect';
+import Swal from 'sweetalert2';
 import { useEffect, useState } from 'react';
-import { Permission } from '../../types/permission';
+import { Button, Checkbox, FormControlLabel, FormGroup, TextField } from '@mui/material';
+import CustomBreadcrumbs from '@/components/CustomBreadcrumbs';
+import CustomSelect from '@/components/CustomSelect';
+import { Permission } from '@/types/permission';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 import { userValidationSchema } from '@/helpers/validation/userSchema';
-import { UserFormValues } from '@/app/types/user';
+import { UserFormValues } from '@/types/user';
 import { userService } from '@/service/userService';
-import Swal from 'sweetalert2';
 import { permissionService } from '@/service/permissionService';
 
 interface UserFormProps {

@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { User } from '../types/user';
+import { User } from '@/types/user';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRouter } from 'next/navigation';
-import { DeleteConfirmationModal } from '../components/DeleteConfirmationModal';
-import { ActionsDataTable, DataTable } from '../components/Datatable';
+import { DeleteConfirmationModal } from '@/components/DeleteConfirmationModal';
+import { ActionsDataTable, DataTable } from '@/components/Datatable';
 import { userService } from '@/service/userService';
 import Swal from 'sweetalert2';
 
@@ -89,8 +89,7 @@ export default function Users() {
           text: 'O usuário foi removido da lista.',
         });
         fetchUsers();
-      } catch (error) {
-        console.error('Erro ao excluir usuário:', error);
+      } catch {
         Swal.fire({
           icon: 'error',
           title: 'Erro ao excluir usuário',
