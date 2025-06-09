@@ -51,6 +51,7 @@ export function DeleteConfirmationModal({
             variant="outlined"
             className="border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md text-base font-medium !capitalize"
             disabled={loading}
+            loading={loading}
           >
             Cancelar
           </Button>
@@ -60,6 +61,7 @@ export function DeleteConfirmationModal({
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-base font-medium !capitalize shadow-none"
             autoFocus
             disabled={loading}
+            loading={loading}
           >
             Excluir
           </Button>

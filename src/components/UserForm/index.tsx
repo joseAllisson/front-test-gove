@@ -12,6 +12,7 @@ import { userValidationSchema } from '@/helpers/validation/userSchema';
 import { UserFormValues } from '@/types/user';
 import { userService } from '@/service/userService';
 import { permissionService } from '@/service/permissionService';
+import { formatPhoneMask } from '@/helpers/formatPhoneMask';
 
 interface UserFormProps {
   initialValues?: UserFormValues;
@@ -22,8 +23,10 @@ interface UserFormProps {
 export default function UserForm({ initialValues, userId, isEdit = false }: UserFormProps) {
   const router = useRouter();
   const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (values: UserFormValues) => {
+    setLoading(true);
     try {
       if (isEdit && userId) {
         await userService.updateUser(userId, values);
@@ -49,6 +52,7 @@ export default function UserForm({ initialValues, userId, isEdit = false }: User
         text: 'Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.',
       });
     }
+    setLoading(false);
   };
 
   const formik = useFormik<UserFormValues>({
@@ -95,6 +99,11 @@ export default function UserForm({ initialValues, userId, isEdit = false }: User
     return formik.values.permissions.includes(childId) || false;
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatPhoneMask(e.target.value);
+    formik.setFieldValue('phone', formattedValue);
+  };
+
   return (
     <section>
       <CustomBreadcrumbs
@@ -135,7 +144,7 @@ export default function UserForm({ initialValues, userId, isEdit = false }: User
             label="Telefone*"
             variant="standard"
             value={formik.values.phone}
-            onChange={formik.handleChange}
+            onChange={handlePhoneChange}
             error={formik.touched.phone && Boolean(formik.errors.phone)}
             helperText={formik.touched.phone ? formik.errors.phone : ''}
           />
@@ -192,10 +201,18 @@ export default function UserForm({ initialValues, userId, isEdit = false }: User
             variant="outlined"
             className="!mt-16 !capitalize"
             onClick={() => router.push('/usuarios')}
+            disabled={loading}
+            loading={loading}
           >
             Voltar
           </Button>
-          <Button type="submit" variant="contained" color="primary" className="!mt-16 !capitalize">
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            className="!mt-16 !capitalize"
+            disabled={loading}
+          >
             Salvar
           </Button>
         </div>
