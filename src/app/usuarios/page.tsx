@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { User } from '@/types/user';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,6 +10,7 @@ import { DeleteConfirmationModal } from '@/components/DeleteConfirmationModal';
 import { ActionsDataTable, DataTable } from '@/components/Datatable';
 import { userService } from '@/service/userService';
 import Swal from 'sweetalert2';
+import { formatDate } from '@/helpers/formatDate';
 
 interface Filters {
   page: number;
@@ -35,36 +34,30 @@ export default function Users() {
     order: 'desc',
   });
 
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: ptBR });
-    } catch {
-      return dateString;
-    }
-  };
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const response = await userService.getUsersList(
-        filters.page + 1,
-        filters.perPage,
-        filters.orderBy,
-        filters.order
-      );
-      setUsers(response.data);
-      setFilters((prev) => ({ ...prev, total: response.total }));
-    } catch (error) {
-      console.error('Erro ao buscar usuários:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro ao buscar usuários',
-        text: 'Ocorreu um erro ao tentar buscar a lista de usuários. Por favor, tente novamente.',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchUsers = useMemo(() => {
+    return async () => {
+      setLoading(true);
+      try {
+        const response = await userService.getUsersList(
+          filters.page + 1,
+          filters.perPage,
+          filters.orderBy,
+          filters.order
+        );
+        setUsers(response.data);
+        setFilters((prev) => ({ ...prev, total: response.total }));
+      } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao buscar usuários',
+          text: 'Ocorreu um erro ao tentar buscar a lista de usuários. Por favor, tente novamente.',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+  }, [filters.page, filters.perPage, filters.orderBy, filters.order]);
 
   const handleEdit = (userId: number) => {
     router.push(`/editar-usuario/${userId}`);
@@ -134,7 +127,7 @@ export default function Users() {
 
   useEffect(() => {
     fetchUsers();
-  }, [filters.page, filters.perPage, filters.orderBy, filters.order]);
+  }, [filters.page, filters.perPage, filters.orderBy, filters.order, fetchUsers]);
 
   return (
     <section>

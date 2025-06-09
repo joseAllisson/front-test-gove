@@ -68,15 +68,6 @@ export default function UserForm({ initialValues, userId, isEdit = false }: User
     onSubmit,
   });
 
-  useEffect(() => {
-    const getPermissions = async () => {
-      const result = await permissionService.getAll();
-      setPermissions(result);
-    };
-
-    getPermissions();
-  }, []);
-
   const handlePermissionChange =
     (childId: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const currentPermissions = [...(formik.values.permissions || [])];
@@ -103,6 +94,15 @@ export default function UserForm({ initialValues, userId, isEdit = false }: User
     const formattedValue = formatPhoneMask(e.target.value);
     formik.setFieldValue('phone', formattedValue);
   };
+
+  useEffect(() => {
+    const getPermissions = async () => {
+      const result = await permissionService.getAll();
+      setPermissions(result);
+    };
+
+    getPermissions();
+  }, []);
 
   return (
     <section>

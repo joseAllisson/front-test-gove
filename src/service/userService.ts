@@ -1,5 +1,5 @@
-import { ApiResponse } from '@/app/types/global';
-import { User, UserFormValues } from '@/app/types/user';
+import { ApiResponse } from '@/types/global';
+import { User, UserFormValues } from '@/types/user';
 import goveApi from './goveApi';
 
 export const userService = {
@@ -8,7 +8,6 @@ export const userService = {
     perPage = 10,
     orderBy = 'name',
     order = 'asc',
-    next?: NextFetchRequestConfig,
   ): Promise<ApiResponse<User[]>> => {
     const { data } = await goveApi.get('/users', {
       params: {
@@ -17,16 +16,13 @@ export const userService = {
         order_by: orderBy,
         order
       },
-      next
     });
 
     return data;
   },
 
-  getUserById: async (userId: number, next?: NextFetchRequestConfig): Promise<User> => {
-    const { data } = await goveApi.get(`/users/${userId}`, {
-      next
-    });
+  getUserById: async (userId: number): Promise<User> => {
+    const { data } = await goveApi.get(`/users/${userId}`);
     return data;
   },
 
