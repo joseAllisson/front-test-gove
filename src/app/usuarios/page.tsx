@@ -119,14 +119,16 @@ export default function Users() {
 
   const actions: ActionsDataTable[] = [
     {
+      label: 'Editar',
       icon: <EditIcon />,
       onClick: (row: User) => handleEdit(row.id),
-      color: 'primary',
+      color: 'blue',
     },
     {
+      label: 'Excluir',
       icon: <DeleteIcon />,
       onClick: handleDelete,
-      color: 'error',
+      color: 'red',
     },
   ];
 

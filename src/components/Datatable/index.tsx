@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { JSX } from 'react';
+import React, { JSX, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -12,20 +12,24 @@ import {
   CircularProgress,
   Box,
   Pagination,
-  PaginationItem
+  PaginationItem,
+  Menu,
+  MenuItem
 } from '@mui/material';
 import {
   KeyboardArrowLeft,
   KeyboardArrowRight,
   KeyboardArrowUp,
-  KeyboardArrowDown
+  KeyboardArrowDown,
+  MoreVert
 } from '@mui/icons-material';
 
 export interface ActionsDataTable {
     icon: JSX.Element;
     onClick: (row: any) => void;
-    color?: 'inherit' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
-} 
+    color?: string;
+    label: string;
+}
 
 interface DataTableProps<T> {
   data: T[];
@@ -60,9 +64,29 @@ export function DataTable<T>({
   order = 'asc',
   onSort
 }: DataTableProps<T>) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedRow, setSelectedRow] = useState<any>(null);
+
   const handleSort = (column: string) => {
     if (onSort) {
       onSort(column);
+    }
+  };
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, row: T) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedRow(row);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedRow(null);
+  };
+
+  const handleActionClick = (action: ActionsDataTable) => {
+    if (selectedRow) {
+      action.onClick(selectedRow);
+      handleMenuClose();
     }
   };
 
@@ -95,16 +119,16 @@ export function DataTable<T>({
               </TableCell>
             ))}
             {actions.length > 0 && (
-              <TableCell 
-                align="center" 
-                sx={{ 
-                  width: '150px',
-                  minWidth: '150px'
+              <TableCell
+                align="center"
+                sx={{
+                  width: '80px',
+                  minWidth: '80px'
                 }}
               >
                 Ações
               </TableCell>
-              )}
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -141,23 +165,13 @@ export function DataTable<T>({
                   </TableCell>
                 ))}
                 {actions.length > 0 && (
-                  <TableCell 
-                    align="center"
-                    sx={{ 
-                      width: '100px',
-                      minWidth: '100px'
-                    }}
-                  >
-                    {actions.map((action, i) => (
-                      <IconButton
-                        key={i}
-                        onClick={() => action.onClick(row)}
-                        color={action.color || 'primary'}
-                        size="small"
-                      >
-                        {action.icon}
-                      </IconButton>
-                    ))}
+                  <TableCell align="center">
+                    <IconButton
+                      size="small"
+                      onClick={(event) => handleMenuClick(event, row)}
+                    >
+                      <MoreVert />
+                    </IconButton>
                   </TableCell>
                 )}
               </TableRow>
@@ -166,33 +180,50 @@ export function DataTable<T>({
         </TableBody>
       </Table>
 
-        <Box display="flex" justifyContent="space-between" p={2}>
-          <p className='text-gray-500'>
-            Total: {totalItems}
-          </p>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        {actions.map((action, index) => (
+          <MenuItem
+            key={index} 
+            onClick={() => handleActionClick(action)}
+            sx={{ color: action.color || 'inherit' }}
+          >
+            <span className="pr-2">{action.icon}</span>
+            {action.label}
+          </MenuItem>
+        ))}
+      </Menu>
 
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={(_, value) => onPageChange(value)}
-            renderItem={(item) => (
-              <PaginationItem
-                slots={{ previous: KeyboardArrowLeft, next: KeyboardArrowRight }}
-                {...item}
-                sx={{
-                  '&:not(.Mui-selected)': {
-                    backgroundColor: '#d3d3d3'
-                  }
-                }}
-              />
-            )}
-            siblingCount={1}
-            boundaryCount={1}
-            showFirstButton={true}
-            showLastButton={true}
-            color='primary'
-          />
-        </Box>
+      <Box display="flex" justifyContent="space-between" p={2}>
+        <p className='text-gray-500'>
+          Total: {totalItems}
+        </p>
+
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={(_, value) => onPageChange(value)}
+          renderItem={(item) => (
+            <PaginationItem
+              slots={{ previous: KeyboardArrowLeft, next: KeyboardArrowRight }}
+              {...item}
+              sx={{
+                '&:not(.Mui-selected)': {
+                  backgroundColor: '#d3d3d3'
+                }
+              }}
+            />
+          )}
+          siblingCount={1}
+          boundaryCount={1}
+          showFirstButton={true}
+          showLastButton={true}
+          color='primary'
+        />
+      </Box>
     </TableContainer>
   );
 }
